@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getAllUsers } from "../services/getAllUsers";
 import UserCardList from "../components/UserCardList";
-import { TextField } from "@mui/material";
+import { TextField, Container, Typography } from "@mui/material";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
@@ -22,16 +22,21 @@ export default function UserList() {
     );
 
     return (
-        <div>
+        <Container sx={{ mt: 4, mb: 4 }}>
+            <Typography variant="h4" gutterBottom>User Directory</Typography>
             <TextField
-                label="Search"
+                label="Search by name or email"
                 variant="outlined"
                 fullWidth
                 margin="normal"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
             />
-            <UserCardList users={filteredUsers} />
-        </div>
+            {filteredUsers.length ? (
+                <UserCardList users={filteredUsers} />
+            ) : (
+                <Typography sx={{ mt: 2 }}>No users found.</Typography>
+            )}
+        </Container>
     );
 }

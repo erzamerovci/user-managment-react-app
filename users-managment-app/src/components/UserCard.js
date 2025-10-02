@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Avatar, Box } from "@mui/material";
+import { Card, CardContent, Typography, Avatar, Box , Stack} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 export default function UserCard({ user }) {
@@ -14,16 +14,18 @@ export default function UserCard({ user }) {
             onClick={() => navigate(`/users/${user.id}`)}
         >
             <CardContent>
-                <Box display="flex" alignItems="center" gap={2}>
+                {/* <Box display="flex" alignItems="center" gap={2}> */}
+                <Stack direction="row" spacing={2} alignItems="center">
                     <Avatar sx={{ bgcolor: "primary.main" }}>
                         {user.name[0]}
                     </Avatar>
-                    <Box>
+                    <div>
                         <Typography variant="h5">{user.name}</Typography>
                         <Typography color="text.secondary">{user.email}</Typography>
                         <Typography variant="body2">{user.company.name}</Typography>
-                    </Box>
-                </Box>
+                    </div>
+                </Stack>
+                {/* </Box> */}
             </CardContent>
         </Card>
     );

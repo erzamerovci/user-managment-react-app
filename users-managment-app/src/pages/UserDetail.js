@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAllUsers } from "../services/getAllUsers";
-import { Typography } from "@mui/material";
+import { Card, CardContent, Typography, Grid, Container } from "@mui/material";
 
 export default function UserDetail() {
     const { id } = useParams();
@@ -19,14 +19,26 @@ export default function UserDetail() {
     if (!user) return <p>Loading data...</p>
 
     return (
-        <div>
-            <Typography variant="h4">{user.name}</Typography>
-            <Typography>Email:{user.email}</Typography>
-            <Typography>Phone:{user.phone}</Typography>
-            <Typography>Website:{user.website}</Typography>
-            <Typography>
-                Address: {user.address.street}, {user.address.city}
-            </Typography>
-        </div>
+        <Container sx={{ mt: 4 }}>
+            <Card sx={{ maxWidth: 600, margin: "0 auto", padding: 2, boxShadow: 4 }}>
+                <CardContent>
+                    <Typography variant="h4" gutterBottom>{user.name}</Typography>
+                    <Grid container spacing={1}>
+                        <Grid item xs={12}>
+                            <Typography><strong>Email:</strong>{user.email}</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography><strong>Phone:</strong>{user.phone}</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography><strong>Website:</strong>{user.website}</Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography> <strong>Address:</strong>{user.address.street}, {user.address.city}</Typography>
+                        </Grid>
+                    </Grid>
+                </CardContent>
+            </Card>
+        </Container>
     )
 }
