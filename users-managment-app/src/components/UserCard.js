@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Avatar, Stack} from "@mui/material";
+import { Card, CardContent, Typography, Avatar, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 export default function UserCard({ user }) {
@@ -11,8 +11,8 @@ export default function UserCard({ user }) {
                 transition: "0.3s",
                 "&:hover": { transform: "scale(1.03)", boxShadow: 6 },
                 height: 150,
-                width:350,
-                mt:7
+                width: 350,
+                mt: 7
             }}
             onClick={() => navigate(`/users/${user.id}`)}
         >
