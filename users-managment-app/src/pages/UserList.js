@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setUsers, addUser, updateUser, deleteUser } from "../redux/usersSlice";
 import { getAllUsers } from "../services/getAllUsers";
 import UserCardList from "../components/UserCardList";
 import {
@@ -13,7 +15,9 @@ import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import Spinner from "../components/Spinner";
 
 export default function UserList() {
-    const [users, setUsers] = useState([]);
+    // const [users, setUsers] = useState([]);
+    const users = useSelector((state) => state.users);
+    const dispatch = useDispatch();
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState(false);
     const [sortBy, setSortBy] = useState("default");
@@ -35,7 +39,7 @@ export default function UserList() {
             setLoading(true);
             const datafromApi = await getAllUsers();
             const datafromLocalStorage = JSON.parse(localStorage.getItem("localUsers") || "[]").reverse();
-            setUsers([...datafromLocalStorage, ...datafromApi]);
+            dispatch(setUsers([...datafromLocalStorage, ...datafromApi]));
             setLoading(false);
         }
         fetchData();
@@ -57,7 +61,7 @@ export default function UserList() {
         setErrors(formErrors);
         return Object.keys(formErrors).length === 0;
     }
-    const addUser = (e) => {
+    const handleAddUser = (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
@@ -77,7 +81,7 @@ export default function UserList() {
             }
         };
 
-        setUsers([usertoAdd, ...users]);
+        dispatch(addUser(usertoAdd));
         const localUsers = JSON.parse(localStorage.getItem("localUsers") || "[]");
         localUsers.push(usertoAdd);
         localStorage.setItem("localUsers", JSON.stringify(localUsers));
@@ -140,73 +144,74 @@ export default function UserList() {
 
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Add a New User</DialogTitle>
-                <DialogContent>
-                    <Box
-                        component="form"
-                        onSubmit={addUser}
-                        sx={{
-                            display: "grid",
-                            gap: 2,
-                            gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-                            mt: 1
-                        }}
-                    >
-                        <TextField
-                            label="Name"
-                            name="name"
-                            value={newUser.name}
-                            onChange={handleInputChange}
-                            error={!!errors.name}
-                            helperText={errors.name}
-                            required
-                        />
-                        <TextField
-                            label="Email"
-                            name="email"
-                            value={newUser.email}
-                            onChange={handleInputChange}
-                            error={!!errors.email}
-                            helperText={errors.email}
-                            required
-                        />
-                        <TextField
-                            label="Phone"
-                            name="phone"
-                            value={newUser.phone}
-                            onChange={handleInputChange}
-                        />
-                        <TextField
-                            label="Website"
-                            name="website"
-                            value={newUser.website}
-                            onChange={handleInputChange}
-                        />
-                        <TextField
-                            label="Street"
-                            name="street"
-                            value={newUser.street}
-                            onChange={handleInputChange}
-                        />
-                        <TextField
-                            label="City"
-                            name="city"
-                            value={newUser.city}
-                            onChange={handleInputChange}
-                        />
-                        <TextField
-                            label="Company"
-                            name="company"
-                            value={newUser.company}
-                            onChange={handleInputChange}
-                        />
-                    </Box>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
-                    <Button onClick={addUser} variant="contained" color="primary">
-                        Save
-                    </Button>
-                </DialogActions>
+                {/* <DialogContent> */}
+                <Box
+                    component="form"
+                    onSubmit={handleAddUser}
+                    sx={{
+                        display: "grid",
+                        gap: 2,
+                        gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                        mt: 1,
+                        px: 3,
+                        pb: 2
+                    }}
+                >
+                    <TextField
+                        label="Name"
+                        name="name"
+                        value={newUser.name}
+                        onChange={handleInputChange}
+                        error={!!errors.name}
+                        helperText={errors.name}
+                        required
+                    />
+                    <TextField
+                        label="Email"
+                        name="email"
+                        value={newUser.email}
+                        onChange={handleInputChange}
+                        error={!!errors.email}
+                        helperText={errors.email}
+                        required
+                    />
+                    <TextField
+                        label="Phone"
+                        name="phone"
+                        value={newUser.phone}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        label="Website"
+                        name="website"
+                        value={newUser.website}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        label="Street"
+                        name="street"
+                        value={newUser.street}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        label="City"
+                        name="city"
+                        value={newUser.city}
+                        onChange={handleInputChange}
+                    />
+                    <TextField
+                        label="Company"
+                        name="company"
+                        value={newUser.company}
+                        onChange={handleInputChange}
+                    />
+                    <DialogActions sx={{ gridColumn: "1 / -1" }}>
+                        <Button onClick={() => setOpen(false)}>Cancel</Button>
+                        <Button type="submit" variant="contained" color="primary">
+                            Save
+                        </Button>
+                    </DialogActions>
+                </Box>
             </Dialog>
             {loading ? (
                 <Spinner />
