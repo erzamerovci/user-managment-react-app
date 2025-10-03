@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAllUsers } from "../services/getAllUsers";
 import { Card, CardContent, Typography, Grid, Container } from "@mui/material";
-
+import Sppiner from "../components/Spinner";
 export default function UserDetail() {
     const { id } = useParams();
     const [user, setUser] = useState(null)
@@ -11,12 +11,20 @@ export default function UserDetail() {
         async function fetchData() {
             const data = await getAllUsers();
             const found = data.find((u) => u.id === parseInt(id))
-            setUser(found);
+            if (found) {
+                setUser(found);
+            } else {
+                const localUsers = JSON.parse(localStorage.getItem("localUsers") || "[]");
+                const localFound = localUsers.find(u => u.id === parseInt(id));
+                setUser(localFound || null);
+            }
         }
         fetchData();
     }, [id])
 
-    if (!user) return <p>Loading data...</p>
+    if (!user) return (
+        <Sppiner />
+    )
 
     return (
         <Container sx={{ mt: 4 }}>
