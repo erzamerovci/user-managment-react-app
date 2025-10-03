@@ -2,16 +2,23 @@ import { useState, useEffect } from "react";
 import { getAllUsers } from "../services/getAllUsers";
 import UserCardList from "../components/UserCardList";
 import {
-    TextField, Container, Typography, Paper, Box, Button, Dialog,
+    TextField, Container, Typography, Box, Button, Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions
+    DialogActions,
+    Select, MenuItem,
+    IconButton,
 } from "@mui/material";
+import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
+import Spinner from "../components/Spinner";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState("");
     const [open, setOpen] = useState(false);
+    const [sortBy, setSortBy] = useState("default");
+    const [sortDirection, setSortDirection] = useState("asc");
+    const [loading, setLoading] = useState(true);
     const [newUser, setNewUser] = useState({
         name: "",
         email: "",
@@ -25,9 +32,11 @@ export default function UserList() {
 
     useEffect(() => {
         async function fetchData() {
+            setLoading(true);
             const datafromApi = await getAllUsers();
-            const datafromLocalStorage = JSON.parse(localStorage.getItem("localUsers") || "[]");
+            const datafromLocalStorage = JSON.parse(localStorage.getItem("localUsers") || "[]").reverse();
             setUsers([...datafromLocalStorage, ...datafromApi]);
+            setLoading(false);
         }
         fetchData();
     }, []);
@@ -90,6 +99,15 @@ export default function UserList() {
             user.name.toLowerCase().includes(search.toLowerCase()) ||
             user.email.toLowerCase().includes(search.toLowerCase())
     );
+    const sortedUsers = sortBy === "default"
+        ? filteredUsers
+        : [...filteredUsers].sort((a, b) => {
+            let compare = 0;
+            if (sortBy === "name") compare = a.name.localeCompare(b.name);
+            if (sortBy === "email") compare = a.email.localeCompare(b.email);
+            if (sortBy === "company") compare = a.company.name.localeCompare(b.company.name);
+            return sortDirection === "asc" ? compare : -compare;
+        });
 
     return (
         <Container sx={{ mt: 4, mb: 4 }}>
@@ -99,6 +117,27 @@ export default function UserList() {
                     Add User
                 </Button>
             </Box>
+            <Box sx={{ display: "flex", gap: 2, mb: 2, alignItems: "center", flexWrap: "wrap" }}>
+                <TextField
+                    label="Search by name or email"
+                    variant="outlined"
+                    fullWidth
+                    margin="normal"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    sx={{ flex: 1, minWidth: 200 }}
+                />
+                <Select value={sortBy || ""} onChange={(e) => setSortBy(e.target.value)} displayEmpty>
+                    <MenuItem value="default">SORT</MenuItem>
+                    <MenuItem value="name">Sort by Name</MenuItem>
+                    <MenuItem value="email">Sort by Email</MenuItem>
+                    <MenuItem value="company">Sort by Company</MenuItem>
+                </Select>
+                <IconButton onClick={() => setSortDirection(sortDirection === "asc" ? "desc" : "asc")}>
+                    {sortDirection === "asc" ? <ArrowUpward /> : <ArrowDownward />}
+                </IconButton>
+            </Box>
+
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Add a New User</DialogTitle>
                 <DialogContent>
@@ -169,20 +208,15 @@ export default function UserList() {
                     </Button>
                 </DialogActions>
             </Dialog>
-
-            <TextField
-                label="Search by name or email"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
-            {filteredUsers.length ? (
-                <UserCardList users={filteredUsers} />
+            {loading ? (
+                <Spinner />
+            ) : sortedUsers.length ? (
+                <UserCardList users={sortedUsers} />
             ) : (
                 <Typography sx={{ mt: 2 }}>No users found.</Typography>
             )}
+
+
         </Container>
     );
 }
